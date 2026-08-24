@@ -66,3 +66,30 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+.document-heading,
+.document-paragraph,
+.document-chart,
+.document-flowchart,
+.document-element {
+  margin-top: 20px;
+}
+
+.element-type {
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.document-heading h2,
+.document-chart h2,
+.document-flowchart h2,
+.document-element h2 {
+  margin-bottom: 10px;
+}
+
+.element-description {
+  margin-top: 12px;
+  font-style: italic;
+}

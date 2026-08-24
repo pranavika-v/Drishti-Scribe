@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import ElementRenderer from "./ElementRenderer";
 
 function Reader({
   documentData,
@@ -49,23 +50,7 @@ function Reader({
         Element {currentElementIndex + 1} of {elements.length}
       </p>
 
-      <section
-        className="element"
-        aria-labelledby="element-title"
-      >
-        <p className="element-type">
-          {element.type || "Element"}
-        </p>
-
-        <h2 id="element-title">
-          {element.text || "Untitled"}
-        </h2>
-
-        <p>
-          {element.description ||
-            "No description available."}
-        </p>
-      </section>
+      <ElementRenderer element={element} />
     </main>
   );
 }
