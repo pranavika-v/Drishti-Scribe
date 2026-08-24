@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Drishti-Scribe</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Drishti-Scribe</h1>
+    <p>
+        Accessible document understanding for visually impaired users
+    </p>
+</header>
+
+
+<main>
+
+    <!-- Upload section -->
+
+    <section class="card">
+
+        <h2>Upload Document</h2>
+
+        <label for="pdfInput">
+            Select a PDF document
+        </label>
+
+        <input
+            id="pdfInput"
+            type="file"
+            accept=".pdf,application/pdf"
+        >
+
+        <button id="analyzeBtn">
+            Analyze Document
+        </button>
+
+        <p id="status" aria-live="polite">
+            Waiting for document...
+        </p>
+
+    </section>
+
+
+    <!-- Reader section -->
+
+    <section
+        id="reader"
+        class="card hidden"
+        aria-label="Accessible document reader"
+    >
+
+        <div class="reader-header">
+
+            <div>
+                <h2 id="documentTitle">
+                    Document
+                </h2>
+
+                <p id="pageIndicator">
+                    Page 1
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Current element -->
+
+        <div
+            id="currentElement"
+            class="current-element"
+            tabindex="0"
+            aria-live="polite"
+        >
+
+            <p id="elementType">
+                Element
+            </p>
+
+            <h3 id="elementTitle">
+                Ready
+            </h3>
+
+            <p id="elementDescription">
+                Upload a document to begin.
+            </p>
+
+        </div>
+
+
+        <!-- Navigation -->
+
+        <div class="navigation">
+
+            <button id="previousBtn">
+                Previous
+            </button>
+
+            <button id="nextBtn">
+                Next
+            </button>
+
+        </div>
+
+
+        <!-- Speech controls -->
+
+        <div class="speech-controls">
+
+            <button id="readBtn">
+                🔊 Read Aloud
+            </button>
+
+            <button id="pauseBtn">
+                ⏸ Pause
+            </button>
+
+            <button id="resumeBtn">
+                ▶ Resume
+            </button>
+
+            <button id="stopBtn">
+                ⏹ Stop
+            </button>
+
+        </div>
+
+
+        <!-- Full document structure -->
+
+        <div class="structure">
+
+            <h2>Document Structure</h2>
+
+            <div id="structureList"></div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
