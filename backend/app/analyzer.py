@@ -16,12 +16,20 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 
+class ChartData(BaseModel):
+    label: str
+    value: float
+
+
 class Element(BaseModel):
-    id: str = ""
+    id: str | None = None
+    
     type: str
     text: str
     description: str
 
+    chart_type: str | None = None
+    data: list[ChartData] | None = None
 
 class Page(BaseModel):
     page: int
@@ -54,6 +62,24 @@ For charts, describe important values and trends.
 For tables, preserve important information.
 For diagrams and flowcharts, describe relationships, sequence, and decisions.
 Do not omit important visual information.
+
+For charts, provide structured chart information.
+
+If an element is a chart:
+- Set type to "chart".
+- Set chart_type to one of: "bar", "line", "pie", "donut", or "unknown".
+- Extract the chart title into text.
+- Provide a concise accessibility-oriented description.
+- Extract every clearly readable data point into the data array.
+- Each data item must contain a label and numeric value.
+- Do not invent values that are not visible in the document.
+- If chart values cannot be reliably read, use an empty data array.
+- For non-chart elements, set chart_type to null and data to null.
+
+For flowcharts:
+- Set type to "flowchart".
+- Describe the sequence of steps and decision branches clearly.
+- Do not invent steps that are not visible.
 """
 
     response = client.models.generate_content(

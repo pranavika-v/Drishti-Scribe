@@ -33,24 +33,44 @@ function ElementRenderer({ element }) {
       );
 
     case "chart":
-      return (
-        <section
-          className="document-chart"
-          aria-label="Chart"
-        >
-          <p className="element-type">Chart</p>
+        return (
+            <section
+            className="document-chart"
+            aria-label="Chart"
+            >
+            <p className="element-type">
+                Chart
+            </p>
 
-          <h2>
-            {element.text || "Chart"}
-          </h2>
+            <h2>
+                {element.text || "Chart"}
+            </h2>
 
-          <p>
-            {element.description ||
-              "No chart description available."}
-          </p>
-        </section>
-      );
+            <p>
+                {element.description ||
+                "No chart description available."}
+            </p>
 
+            {element.chart_type && (
+                <p>
+                Chart type: {element.chart_type}
+                </p>
+            )}
+
+            {element.data &&
+                element.data.length > 0 && (
+                <ul className="chart-data">
+                    {element.data.map(
+                    (item, index) => (
+                        <li key={index}>
+                        {item.label}: {item.value}
+                        </li>
+                    )
+                    )}
+                </ul>
+                )}
+            </section>
+        );
     case "flowchart":
       return (
         <section

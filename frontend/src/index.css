@@ -93,3 +93,12 @@ button:disabled {
   margin-top: 12px;
   font-style: italic;
 }
+
+.chart-data {
+  margin-top: 16px;
+  padding-left: 24px;
+}
+
+.chart-data li {
+  margin-bottom: 6px;
+}
