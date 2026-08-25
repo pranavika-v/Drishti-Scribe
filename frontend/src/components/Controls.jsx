@@ -6,12 +6,54 @@ function Controls({
   speechText,
 }) {
   const [speaking, setSpeaking] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
+  const [rate, setRate] = useState(1);
 
   useEffect(() => {
+    function loadVoices() {
+      const availableVoices =
+        window.speechSynthesis.getVoices();
+
+      setVoices(availableVoices);
+
+      if (
+        availableVoices.length > 0 &&
+        !selectedVoice
+      ) {
+        const preferredVoice =
+          availableVoices.find(
+            (voice) =>
+              voice.lang.startsWith("en") &&
+              /natural|neural|premium|google/i.test(
+                voice.name
+              )
+          ) ||
+          availableVoices.find((voice) =>
+            voice.lang.startsWith("en")
+          ) ||
+          availableVoices[0];
+
+        setSelectedVoice(preferredVoice.name);
+      }
+    }
+
+    loadVoices();
+
+    window.speechSynthesis.addEventListener(
+      "voiceschanged",
+      loadVoices
+    );
+
     return () => {
+      window.speechSynthesis.removeEventListener(
+        "voiceschanged",
+        loadVoices
+      );
+
       window.speechSynthesis.cancel();
     };
-  }, []);
+  }, [selectedVoice]);
 
   function handlePlay() {
     if (!speechText) return;
@@ -20,6 +62,18 @@ function Controls({
 
     const utterance =
       new SpeechSynthesisUtterance(speechText);
+
+    const voice = voices.find(
+      (item) => item.name === selectedVoice
+    );
+
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.rate = rate;
+    utterance.pitch = 1;
+    utterance.volume = 1;
 
     utterance.onstart = () => {
       setSpeaking(true);
@@ -39,6 +93,23 @@ function Controls({
   function handleStop() {
     window.speechSynthesis.cancel();
     setSpeaking(false);
+  }
+
+  function handleVoiceChange(event) {
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
+    setSelectedVoice(event.target.value);
+  }
+
+  function handleRateChange(event) {
+    const newRate = Number(event.target.value);
+
+    setRate(newRate);
+
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+    }
   }
 
   return (
@@ -82,6 +153,43 @@ function Controls({
       >
         Stop
       </button>
+
+      <label>
+        Voice:
+        <select
+          value={selectedVoice}
+          onChange={handleVoiceChange}
+          disabled={voices.length === 0}
+        >
+          {voices.length === 0 ? (
+            <option value="">
+              Default voice
+            </option>
+          ) : (
+            voices.map((voice) => (
+              <option
+                key={`${voice.name}-${voice.lang}`}
+                value={voice.name}
+              >
+                {voice.name} ({voice.lang})
+              </option>
+            ))
+          )}
+        </select>
+      </label>
+
+      <label>
+        Speed: {rate.toFixed(1)}x
+        <input
+          type="range"
+          min="0.5"
+          max="2"
+          step="0.1"
+          value={rate}
+          onChange={handleRateChange}
+          aria-label="Speech speed"
+        />
+      </label>
     </nav>
   );
 }

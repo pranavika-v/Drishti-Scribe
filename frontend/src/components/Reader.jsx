@@ -5,6 +5,9 @@ function Reader({
   documentData,
   currentPageIndex,
   currentElementIndex,
+  chartDataIndex,
+  onPreviousChartData,
+  onNextChartData,
 }) {
   const readerRef = useRef(null);
 
@@ -17,7 +20,11 @@ function Reader({
     if (readerRef.current) {
       readerRef.current.focus();
     }
-  }, [currentPageIndex, currentElementIndex]);
+  }, [
+    currentPageIndex,
+    currentElementIndex,
+    chartDataIndex,
+  ]);
 
   if (!page || !element) {
     return (
@@ -38,19 +45,34 @@ function Reader({
       tabIndex="-1"
       ref={readerRef}
       aria-live="polite"
+      aria-atomic="true"
       aria-label={`Page ${page.page}, element ${
         currentElementIndex + 1
-      } of ${elements.length}`}
+      } of ${elements.length}${
+        element.type === "chart" && element.data?.length
+          ? `, data point ${
+              chartDataIndex + 1
+            } of ${element.data.length}`
+          : ""
+      }`}
     >
       <p className="page-indicator">
         Page {page.page} of {pages.length}
       </p>
 
       <p className="element-indicator">
-        Element {currentElementIndex + 1} of {elements.length}
+        Element {currentElementIndex + 1} of{" "}
+        {elements.length}
       </p>
 
-      <ElementRenderer element={element} />
+      <ElementRenderer
+        element={element}
+        chartDataIndex={chartDataIndex}
+        onPreviousChartData={
+          onPreviousChartData
+        }
+        onNextChartData={onNextChartData}
+      />
     </main>
   );
 }

@@ -1,4 +1,9 @@
-function ElementRenderer({ element }) {
+function ElementRenderer({
+  element,
+  chartDataIndex,
+  onPreviousChartData,
+  onNextChartData,
+}) {
   if (!element) {
     return null;
   }
@@ -9,11 +14,19 @@ function ElementRenderer({ element }) {
     case "heading":
       return (
         <section className="document-heading">
-          <p className="element-type">Heading</p>
-          <h2>{element.text || "Untitled heading"}</h2>
+          <p className="element-type">
+            Heading
+          </p>
+
+          <h2>
+            {element.text ||
+              "Untitled heading"}
+          </h2>
 
           {element.description && (
-            <p>{element.description}</p>
+            <p>
+              {element.description}
+            </p>
           )}
         </section>
       );
@@ -21,8 +34,13 @@ function ElementRenderer({ element }) {
     case "paragraph":
       return (
         <section className="document-paragraph">
-          <p className="element-type">Paragraph</p>
-          <p>{element.text || ""}</p>
+          <p className="element-type">
+            Paragraph
+          </p>
+
+          <p>
+            {element.text || ""}
+          </p>
 
           {element.description && (
             <p className="element-description">
@@ -32,45 +50,114 @@ function ElementRenderer({ element }) {
         </section>
       );
 
-    case "chart":
-        return (
-            <section
-            className="document-chart"
-            aria-label="Chart"
-            >
-            <p className="element-type">
-                Chart
-            </p>
+    case "chart": {
+      const chartData =
+        element.data || [];
 
-            <h2>
-                {element.text || "Chart"}
-            </h2>
+      const currentDataPoint =
+        chartData[chartDataIndex] || null;
 
+      return (
+        <section
+          className="document-chart"
+          aria-label="Chart"
+        >
+          <p className="element-type">
+            Chart
+          </p>
+
+          <h2>
+            {element.text || "Chart"}
+          </h2>
+
+          <p>
+            {element.description ||
+              "No chart description available."}
+          </p>
+
+          {element.chart_type && (
             <p>
-                {element.description ||
-                "No chart description available."}
+              Chart type:{" "}
+              {element.chart_type}
             </p>
+          )}
 
-            {element.chart_type && (
+          {chartData.length > 0 && (
+            <section
+              className="current-chart-data"
+              aria-live="polite"
+            >
+              <p>
+                Data point{" "}
+                {chartDataIndex + 1} of{" "}
+                {chartData.length}
+              </p>
+
+              {currentDataPoint && (
                 <p>
-                Chart type: {element.chart_type}
+                  <strong>
+                    {currentDataPoint.label}
+                  </strong>
+                  :{" "}
+                  {currentDataPoint.value}
                 </p>
-            )}
-
-            {element.data &&
-                element.data.length > 0 && (
-                <ul className="chart-data">
-                    {element.data.map(
-                    (item, index) => (
-                        <li key={index}>
-                        {item.label}: {item.value}
-                        </li>
-                    )
-                    )}
-                </ul>
-                )}
+              )}
             </section>
-        );
+          )}
+
+          {chartData.length > 0 && (
+            <div className="chart-navigation">
+              <button
+                type="button"
+                onClick={
+                  onPreviousChartData
+                }
+                disabled={
+                  chartDataIndex === 0
+                }
+              >
+                Previous data point
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  onNextChartData
+                }
+                disabled={
+                  chartDataIndex >=
+                  chartData.length - 1
+                }
+              >
+                Next data point
+              </button>
+            </div>
+          )}
+
+          {chartData.length > 0 && (
+            <ul className="chart-data">
+              {chartData.map(
+                (item, index) => (
+                  <li
+                    key={index}
+                    aria-current={
+                      index ===
+                      chartDataIndex
+                        ? "true"
+                        : undefined
+                    }
+                  >
+                    {item.label}:{" "}
+                    {item.value}
+                  </li>
+                )
+              )}
+            </ul>
+          )}
+        </section>
+      );
+    }
+
     case "flowchart":
       return (
         <section
@@ -82,7 +169,8 @@ function ElementRenderer({ element }) {
           </p>
 
           <h2>
-            {element.text || "Flowchart"}
+            {element.text ||
+              "Flowchart"}
           </h2>
 
           <p>
@@ -100,11 +188,14 @@ function ElementRenderer({ element }) {
           </p>
 
           <h2>
-            {element.text || "Untitled"}
+            {element.text ||
+              "Untitled"}
           </h2>
 
           {element.description && (
-            <p>{element.description}</p>
+            <p>
+              {element.description}
+            </p>
           )}
         </section>
       );
