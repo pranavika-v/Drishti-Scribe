@@ -67,6 +67,46 @@ function App() {
       return "";
     }
 
+    // Special handling for charts
+    if (
+      element.type === "chart" &&
+      element.data &&
+      element.data.length > 0
+    ) {
+      const values = element.data;
+
+      const highest = values.reduce(
+        (max, item) =>
+          item.value > max.value ? item : max,
+        values[0]
+      );
+
+      const lowest = values.reduce(
+        (min, item) =>
+          item.value < min.value ? item : min,
+        values[0]
+      );
+
+      const dataText = values
+        .map(
+          (item) =>
+            `${item.label}: ${item.value}`
+        )
+        .join(", ");
+
+      return [
+        `${element.chart_type || "chart"} chart`,
+        element.text,
+        element.description,
+        `The highest value is ${highest.label} at ${highest.value}`,
+        `The lowest value is ${lowest.label} at ${lowest.value}`,
+        `Data points: ${dataText}`,
+      ]
+        .filter(Boolean)
+        .join(". ");
+    }
+
+    // Default speech for all other elements
     return [
       element.type,
       element.text,
@@ -75,61 +115,6 @@ function App() {
       .filter(Boolean)
       .join(". ");
   }
-  useEffect(() => {
-    function handleKeyDown(event) {
-      if (!documentData) {
-        return;
-      }
-
-      // Don't intercept typing inside inputs/buttons.
-      const tagName =
-        event.target.tagName.toLowerCase();
-
-      if (
-        tagName === "input" ||
-        tagName === "textarea" ||
-        tagName === "select"
-      ) {
-        return;
-      }
-
-      if (
-        event.key === "ArrowRight" ||
-        event.key.toLowerCase() === "n"
-      ) {
-        event.preventDefault();
-        handleNext();
-      }
-
-      if (
-        event.key === "ArrowLeft" ||
-        event.key.toLowerCase() === "p"
-      ) {
-        event.preventDefault();
-        handlePrevious();
-      }
-
-      if (event.key === "Escape") {
-        window.speechSynthesis.cancel();
-      }
-    }
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-    };
-  }, [
-    documentData,
-    currentPageIndex,
-    currentElementIndex,
-  ]);
   return (
     <div className="app">
       <h1>Drishti-Scribe</h1>
