@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Upload from "./components/Upload";
 import Reader from "./components/Reader";
 import Controls from "./components/Controls";
+import Chat from "./components/Chat";
 import "./index.css";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [currentElementIndex, setCurrentElementIndex] = useState(0);
   const [chartDataIndex, setChartDataIndex] = useState(0);
+  const [viewMode, setViewMode] = useState("reader"); // "reader" or "chat"
 
   function handleDocumentLoaded(data) {
     setDocumentData(data);
@@ -300,24 +302,42 @@ function App() {
 
       {documentData && (
         <>
-          <Reader
-            documentData={documentData}
-            currentPageIndex={currentPageIndex}
-            currentElementIndex={currentElementIndex}
-            chartDataIndex={chartDataIndex}
-            onPreviousChartData={
-              handlePreviousChartData
-            }
-            onNextChartData={
-              handleNextChartData
-            }
-          />
+          <div className="mode-toggle">
+            <button 
+              onClick={() => setViewMode("reader")} 
+              aria-pressed={viewMode === "reader"}
+              className={viewMode === "reader" ? "active" : ""}
+            >
+              Document Reader
+            </button>
+            <button 
+              onClick={() => setViewMode("chat")} 
+              aria-pressed={viewMode === "chat"}
+              className={viewMode === "chat" ? "active" : ""}
+            >
+              Ask Questions (Chat)
+            </button>
+          </div>
 
-          <Controls
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            speechText={getCurrentSpeechText()}
-          />
+          {viewMode === "reader" ? (
+            <>
+              <Reader
+                documentData={documentData}
+                currentPageIndex={currentPageIndex}
+                currentElementIndex={currentElementIndex}
+                chartDataIndex={chartDataIndex}
+                onPreviousChartData={handlePreviousChartData}
+                onNextChartData={handleNextChartData}
+              />
+              <Controls
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                speechText={getCurrentSpeechText()}
+              />
+            </>
+          ) : (
+            <Chat filename={documentData.filename} />
+          )}
         </>
       )}
     </div>
