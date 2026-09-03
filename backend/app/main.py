@@ -6,11 +6,17 @@ import shutil
 from app.parser import extract_document_from_pdf
 from app.analyzer import analyze_pdf
 from app.chat import chat_with_document, ChatRequest
+from app.explore import (
+    explore_visual,
+    ask_about_visual,
+    ExploreRequest,
+    AskRequest,
+)
 
 app = FastAPI(
     title="Drishti-Scribe API",
     description="Backend for accessible document understanding",
-    version="0.1.0"
+    version="0.2.0",
 )
 
 app.add_middleware(
@@ -21,25 +27,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 
 @app.get("/")
 def root():
-    return {
-        "message": "Drishti-Scribe API is running"
-    }
+    return {"message": "Drishti-Scribe API is running"}
 
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
-
     if not file.filename.lower().endswith(".pdf"):
-        return {
-            "error": "Only PDF files are supported"
-        }
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
     file_path = UPLOAD_DIR / file.filename
 
@@ -49,9 +49,10 @@ async def upload_pdf(file: UploadFile = File(...)):
     analysis = analyze_pdf(str(file_path))
 
     return {
-    "filename": file.filename,
-    "pages": analysis.model_dump()["pages"]
+        "filename": file.filename,
+        "pages": analysis.model_dump()["pages"],
     }
+
 
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
@@ -62,5 +63,34 @@ async def chat_endpoint(request: ChatRequest):
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         import traceback
+
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/explore-visual")
+async def explore_endpoint(request: ExploreRequest):
+    try:
+        response = explore_visual(request)
+        return response
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/ask-about-visual")
+async def ask_endpoint(request: AskRequest):
+    try:
+        response = ask_about_visual(request)
+        return response
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        import traceback
+
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
